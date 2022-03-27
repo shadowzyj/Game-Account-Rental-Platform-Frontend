@@ -23,6 +23,16 @@
           <el-descriptions-item label="是否实名">{{
             isRealName
           }}</el-descriptions-item>
+          <el-descriptions-item label="账号信誉">
+            <el-rate
+              v-model="value"
+              disabled
+              show-score
+              text-color="#ff9900"
+              score-template="{value}"
+            >
+            </el-rate>
+          </el-descriptions-item>
         </el-descriptions>
       </el-card>
     </el-col>
@@ -31,14 +41,20 @@
         <el-col :span="12">
           <el-card class="small-card" shadow="hover">
             <div slot="header" class="clearfix">
-              <span>今日收益</span>
+              <h1>总收益</h1>
+            </div>
+            <div class="text item">
+              <h1>¥&nbsp&nbsp{{ incomeTotal }}</h1>
             </div>
           </el-card>
         </el-col>
         <el-col :span="12">
           <el-card class="small-card" shadow="hover">
             <div slot="header" class="clearfix">
-              <span>昨日收益</span>
+              <h1>今日收益</h1>
+            </div>
+            <div class="text item">
+              <h1>¥&nbsp&nbsp{{ incomeToday }}</h1>
             </div>
           </el-card>
         </el-col>
@@ -47,20 +63,20 @@
         <el-col :span="12">
           <el-card class="small-card" shadow="hover">
             <div slot="header" class="clearfix">
-              <span>总上架数</span>
+              <h1>总上架数</h1>
             </div>
             <div class="text item">
-              <span>{{ upNumber }}</span>
+              <h1>{{ upNumber }}</h1>
             </div>
           </el-card>
         </el-col>
         <el-col :span="12">
           <el-card class="small-card" shadow="hover">
             <div slot="header" class="clearfix">
-              <span>总租用数</span>
+              <h1>总租用数</h1>
             </div>
             <div class="text item">
-              <span>{{ rentNumber }}</span>
+              <h1>{{ rentNumber }}</h1>
             </div>
           </el-card>
         </el-col>
@@ -73,6 +89,8 @@ import Vue from "vue";
 export default Vue.extend({
   created() {
     this.getInfo(window.sessionStorage.getItem("uid"));
+    this.getIncomeTotal(window.sessionStorage.getItem("uid"));
+    this.getIncomeToday(window.sessionStorage.getItem("uid"));
   },
   data() {
     return {
@@ -91,6 +109,9 @@ export default Vue.extend({
       ],
       upNumber: 0,
       rentNumber: 0,
+      value: 5,
+      incomeTotal: 0.0,
+      incomeToday: 0.0,
     };
   },
   methods: {
@@ -109,8 +130,22 @@ export default Vue.extend({
       this.isRealName = res.isRealName;
       this.upNumber = res.upNumber;
       this.rentNumber = res.rentNumber;
-
+      this.value = Math.min(5, res.user.vipLevel + 2);
       //console.log(this.rentNumber);
+    },
+    async getIncomeTotal(uid) {
+      const { data: res } = await this.$http.post("/gameLog/getMyIncome", {
+        uid: uid,
+      });
+      if (res.state != 200) return this.$message.error("信息拉取失败");
+      this.incomeTotal = res.income;
+    },
+        async getIncomeToday(uid) {
+      const { data: res } = await this.$http.post("/gameLog/getMyIncomeToday", {
+        uid: uid,
+      });
+      if (res.state != 200) return this.$message.error("信息拉取失败");
+      this.incomeToday = res.income;
     },
   },
 });

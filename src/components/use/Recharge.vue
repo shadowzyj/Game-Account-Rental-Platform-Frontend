@@ -20,6 +20,9 @@
             <el-form-item>
               <el-button type="primary" @click="onSubmit">立即充值</el-button>
             </el-form-item>
+            <!-- <el-form-item>
+              <el-button type="primary" @click="testSubmit">test</el-button>
+            </el-form-item> -->
           </el-form>
         </el-col>
       </el-card>
@@ -43,7 +46,6 @@
           <el-table-column prop="money" label="充值金额" width="180">
           </el-table-column>
         </el-table>
-
         <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -56,6 +58,9 @@
         </el-pagination>
       </el-card>
     </el-col>
+    <el-col>
+      <div v-html="alipayWap" ref="alipayWap"></div>
+    </el-col>
   </el-row>
 </template>
 <script lang="ts">
@@ -67,7 +72,7 @@ export default {
   data() {
     return {
       money: 0.0,
-      moneyList: [30, 50, 100, 200],
+      moneyList: [0.01,30, 50, 100, 200],
       rechageForm: {
         resource: 0,
       },
@@ -78,6 +83,7 @@ export default {
       pageSize: 5,
       totalPage: 5,
       currentPage: 1,
+      alipayWap: "",
     };
   },
   methods: {
@@ -96,7 +102,18 @@ export default {
         uid: uid,
         money: this.rechageForm.resource,
       });
-      if (res.state != 200) return this.$message.error("充值失败");
+      // if (res.state != 200) return this.$message.error("充值失败");
+      const divForm = document.getElementsByTagName("div");
+      if (divForm.length) {
+        document.body.removeChild(divForm[0]);
+      }
+      const div = document.createElement("div");
+      //将后台响应回来的数据,填写进行页面中进行回显(支付二维码)
+      div.innerHTML = res; // data就是接口返回的form 表单字符串
+      //将元素在页面中显示
+      document.body.appendChild(div);
+      document.forms[0].setAttribute("target", "_blank"); // 新开窗口跳转
+      document.forms[0].submit();
       this.getMoney(uid);
       this.getBankList(uid);
     },
@@ -118,9 +135,24 @@ export default {
       console.log(currentPage);
       this.currentPage = currentPage;
     },
-    handleSizeChange:function(pageSize){
+    handleSizeChange: function (pageSize) {
       this.pageSize = pageSize;
-    }
+    },
+    async testSubmit() {
+      const { data: res } = await this.$http.post("/gotopay");
+      console.log(res);
+      const divForm = document.getElementsByTagName("div");
+      if (divForm.length) {
+        document.body.removeChild(divForm[0]);
+      }
+      const div = document.createElement("div");
+      //将后台响应回来的数据,填写进行页面中进行回显(支付二维码)
+      div.innerHTML = res; // data就是接口返回的form 表单字符串
+      //将元素在页面中显示
+      document.body.appendChild(div);
+      document.forms[0].setAttribute("target", "_blank"); // 新开窗口跳转
+      document.forms[0].submit();
+    },
   },
 };
 </script>
