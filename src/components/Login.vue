@@ -19,7 +19,7 @@
                 </el-form-item>
                 <el-form-item >
                     <el-input v-model="loginForm.code" prefix-icon="iconfont icon-password" style="width:60%"/>
-                    <el-image style="width: 30%;height: 30px;" src="/api/kaptcha/render" fit="cover"></el-image>
+                    <el-image style="width: 30%;height: 30px;" src="/api/user/render" fit="cover"></el-image>
                 </el-form-item>
                 <!-- 按钮 -->
                 <el-form-item class="btns" style="text-align:center">
@@ -37,6 +37,14 @@ export default{
         this.getCode();
     },
     data(){
+        var checkEmail = (rule, value, cb) => {undefined
+            // 邮箱正则表达式
+            const regEmail =  /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/
+            if(regEmail.test(value)){undefined
+            return cb()
+            }
+            cb(new Error('请输入合法的邮箱'))
+        };
         return {
             loginForm:{
                 email:"admin@163.com",
@@ -47,10 +55,11 @@ export default{
                 email:[
                     {required:true, message:'请输入登录邮箱',trigger:'blur'},
                     {min:3, max:50, message:'长度不小于3个字符',trigger:'blur'},
+                    {validator: checkEmail, trigger: 'blur'},
                 ],
                 password:[
                     {required:true, message:'请输入用户密码',trigger:'blur'},
-                    {min:6, max:50, message:'长度不小于6字符',trigger:'blur'},
+                    {min:6,max:30,message:'长度不小于6字符且不大于30字符',trigger:'blur'},
                 ],
             },
             imgurl:"",
@@ -58,10 +67,11 @@ export default{
     },
     methods:{
         async getCode(){
-            const {data:res} = await this.$http.get("/kaptcha/render");
-            let blob = new Blob([res]);
+            const {data:res} = await this.$http.get("/user/render");
+            //this.imgurl = 'data:image/jpeg;base64,'+res;
+            let blob = new Blob([res],{type:"image/jpeg"});
             this.imgurl = window.URL.createObjectURL(blob);
-            console.log(url);
+            //console.log(this.imgurl);
         },
         //重置表单内容
         resetLoginForm(){
@@ -75,7 +85,7 @@ export default{
                 if(!valid) return;
                 const {data:res} = await this.$http.post("/user/login",this.loginForm);
                 //console.log(res);
-                if(res.flag == "OK"){
+                if(res.state == 200){
                     //console.log(res.user);
                     this.$cookie.set("userUid",res.user.uid);
                     this.$cookie.set("userEmail",res.user.email);
@@ -94,8 +104,14 @@ export default{
                     }
                     
                 }
+                else if(res.state==400){
+                    this.$message.error("验证码错误");
+                }
+                else if(res.state==401){
+                    this.$message.error("邮箱不存在");
+                }
                 else{
-                    this.$message.error("登录失败");
+                    this.$message.error("登陆失败");
                 }
             })
         }

@@ -53,6 +53,7 @@ export default {
   methods: {
     async getGameTypeList() {
       const { data: res } = await this.$http.get("/gameType/list");
+      console.log(res);
       this.listSize = res.gameTypeList.length;
       for (let i = 0; i < this.listSize; i++) {
         this.gameTypeList.push(res.gameTypeList[i].gameTypeName);

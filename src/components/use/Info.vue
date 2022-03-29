@@ -116,7 +116,7 @@ export default Vue.extend({
   },
   methods: {
     async getInfo(uid) {
-      console.log(uid);
+      //console.log(uid);
       const { data: res } = await this.$http.post("/user/getInfo", {
         uid: uid,
       });
@@ -144,8 +144,13 @@ export default Vue.extend({
       const { data: res } = await this.$http.post("/gameLog/getMyIncomeToday", {
         uid: uid,
       });
-      if (res.state != 200) return this.$message.error("信息拉取失败");
-      this.incomeToday = res.income;
+      if (res.state == 201) 
+        this.incomeToday = 0.0;
+      else if(res.state == 200)
+        this.incomeToday= res.income;
+      else 
+        return this.$message.error("信息拉取失败");
+      console.log(this.incomeToday);
     },
   },
 });

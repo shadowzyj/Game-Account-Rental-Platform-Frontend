@@ -112,8 +112,8 @@ export default {
       return row[property] === value;
     },
     async selectChange(value,row){
-      console.log(row);
-      console.log(value);
+      //console.log(row);
+      //console.log(value);
       const {data:res} = await this.$http.post("/user/changeVip",{uid:row.uid,vipLevel:value+1});
       if(res.state!=200) return this.$message.error("权限修改失败");
       this.$message.success("权限修改成功");

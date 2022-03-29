@@ -72,7 +72,7 @@ export default {
   data() {
     return {
       money: 0.0,
-      moneyList: [0.01,30, 50, 100, 200],
+      moneyList: [0.01,30, 50, 100, 200,500],
       rechageForm: {
         resource: 0,
       },
@@ -118,10 +118,11 @@ export default {
       this.getBankList(uid);
     },
     async getBankList(uid) {
-      console.log(uid);
+      //console.log(uid);
       const { data: res } = await this.$http.post("/bankLog/getRechargeList", {
         uid: uid,
       });
+      //console.log(res);
       if (res.state != 200) {
         this.listFlag = false;
         return;
@@ -129,10 +130,10 @@ export default {
       this.listFlag = true;
       this.bankList = res.bankLogList;
       this.totalPage = res.bankLogList.length;
-      console.log(this.totalPage);
+      //console.log(this.totalPage);
     },
     handleCurrentChange: function (currentPage) {
-      console.log(currentPage);
+      //console.log(currentPage);
       this.currentPage = currentPage;
     },
     handleSizeChange: function (pageSize) {
@@ -140,7 +141,7 @@ export default {
     },
     async testSubmit() {
       const { data: res } = await this.$http.post("/gotopay");
-      console.log(res);
+      //console.log(res);
       const divForm = document.getElementsByTagName("div");
       if (divForm.length) {
         document.body.removeChild(divForm[0]);

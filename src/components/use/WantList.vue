@@ -153,7 +153,7 @@ export default {
       });
       if (res.state != 200 && res.state != 201)
         return this.$message.error("余额不足，购买失败");
-      if (res.state == 201) this.$message.info("部分商品已被他人购买");
+      if (res.state == 201) this.$message.info("部分商品已被他人购买,或余额不足");
       else {
         this.$message.success("全部购买成功");
       }
