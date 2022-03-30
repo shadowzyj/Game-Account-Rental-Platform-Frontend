@@ -34,7 +34,7 @@
 <script>
 export default{
     created(){
-        this.getCode();
+        //this.getCode();
     },
     data(){
         var checkEmail = (rule, value, cb) => {undefined
